@@ -69,6 +69,19 @@ static SampleItem g_samples[] =
 };
 static const int g_nsamples = sizeof(g_samples) / sizeof(SampleItem);
 
+const float aspect = 16.0f / 9.0f;
+
+static int width = 0;
+static int height = 0;
+
+static int resizeEvent(void* data, SDL_Event* event) {
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
+        SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+        SDL_GetWindowSize(win, &width, &height);
+    }
+    return 0;
+}
+
 int main(int /*argc*/, char** /*argv*/)
 {
 	// Init SDL
@@ -99,9 +112,9 @@ int main(int /*argc*/, char** /*argv*/)
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 
 	bool presentationMode = false;
-	Uint32 flags = SDL_WINDOW_OPENGL;
-	int width;
-	int height;
+	Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+	// int width;
+	// int height;
 	if (presentationMode)
 	{
 		// Create a fullscreen window at the native resolution.
@@ -111,7 +124,7 @@ int main(int /*argc*/, char** /*argv*/)
 	}
 	else
 	{
-		float aspect = 16.0f / 9.0f;
+		// float aspect = 16.0f / 9.0f;
 		width = rcMin(displayMode.w, (int)(displayMode.h * aspect)) - 80;
 		height = displayMode.h - 80;
 	}
@@ -127,6 +140,8 @@ int main(int /*argc*/, char** /*argv*/)
 	}
 
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    SDL_AddEventWatch(resizeEvent, window);
 
 	if (!imguiRenderGLInit("DroidSans.ttf"))
 	{
@@ -334,7 +349,7 @@ int main(int /*argc*/, char** /*argv*/)
 						}
 					}
 					break;
-					
+
 				case SDL_QUIT:
 					done = true;
 					break;
